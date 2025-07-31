@@ -7,9 +7,15 @@ export default function Sidebar() {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/", label: "Home", emoji: "🏠" },
+    { path: "/", label: "Home", emoji: "��" },
+    { path: "/dashboard", label: "Dashboard", emoji: "📊" },
     { path: "/products", label: "Products", emoji: "🛒" },
     { path: "/inventory", label: "Inventory", emoji: "📦" },
+    { path: "/sales", label: "Sales", emoji: "💰" },
+    { path: "/orders", label: "Orders", emoji: "📋" },
+    { path: "/suppliers", label: "Suppliers", emoji: "🏢" },
+    { path: "/analytics", label: "Analytics", emoji: "📈" },
+    { path: "/logistics", label: "Logistics", emoji: "🚚" },
     { path: "/login", label: "Login", emoji: "🔑" },
     { path: "/signup", label: "Sign Up", emoji: "✍️" },
   ];
@@ -37,7 +43,7 @@ export default function Sidebar() {
         <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-black">
           IM
         </div>
-        {!collapsed && <span className="ml-3 font-bold">Inventory</span>}
+        {!collapsed && <span className="ml-3 font-bold">Simple self</span>}
       </div>
 
       {/* Menu */}
