@@ -1,17 +1,17 @@
-// client/src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./HomePage";
 import Login from "./Login";
 import Signup from "./Signup";
-import ForgotPassword from "./ForgotPassword";
+import ProductManagement from "./ProductManagement";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/products" element={<ProductManagement />} />
       </Routes>
     </Router>
   );
