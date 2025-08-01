@@ -11,13 +11,23 @@ export default function AnalyticsPage() {
     { month: 'Jun', sales: 22000, revenue: 28000 }
   ];
 
-  const profitLossData = [
-    { category: 'Profit', value: 45000, color: '#10B981' },
-    { category: 'Loss', value: 8000, color: '#EF4444' },
-    { category: 'Expenses', value: 12000, color: '#F59E0B' }
+  // Sales prediction data (including future months)
+  const salesPredictionData = [
+    { month: 'Jan', actual: 12000, predicted: null },
+    { month: 'Feb', actual: 15000, predicted: null },
+    { month: 'Mar', actual: 18000, predicted: null },
+    { month: 'Apr', actual: 16000, predicted: null },
+    { month: 'May', actual: 20000, predicted: null },
+    { month: 'Jun', actual: 22000, predicted: null },
+    { month: 'Jul', actual: null, predicted: 24000 },
+    { month: 'Aug', actual: null, predicted: 26000 },
+    { month: 'Sep', actual: null, predicted: 28000 },
+    { month: 'Oct', actual: null, predicted: 30000 },
+    { month: 'Nov', actual: null, predicted: 32000 },
+    { month: 'Dec', actual: null, predicted: 34000 }
   ];
 
-  const totalValue = profitLossData.reduce((sum, item) => sum + item.value, 0);
+  const maxValue = Math.max(...salesPredictionData.map(d => Math.max(d.actual || 0, d.predicted || 0)));
 
   return (
     <div className="min-h-screen bg-[#012A2D] text-white p-6">
@@ -125,63 +135,87 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          {/* Profit/Loss Pie Chart */}
+          {/* Sales Prediction Chart */}
           <div className="bg-[#435355] p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Profit & Loss Analysis</h2>
-            <div className="flex items-center justify-center h-64">
-              <div className="relative w-48 h-48">
-                {/* Pie Chart */}
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  {profitLossData.map((item, index) => {
-                    const percentage = (item.value / totalValue) * 100;
-                    const previousPercentages = profitLossData
-                      .slice(0, index)
-                      .reduce((sum, prevItem) => sum + (prevItem.value / totalValue) * 100, 0);
-                    
-                    const startAngle = (previousPercentages / 100) * 360;
-                    const endAngle = ((previousPercentages + percentage) / 100) * 360;
-                    
-                    const x1 = 50 + 40 * Math.cos((startAngle * Math.PI) / 180);
-                    const y1 = 50 + 40 * Math.sin((startAngle * Math.PI) / 180);
-                    const x2 = 50 + 40 * Math.cos((endAngle * Math.PI) / 180);
-                    const y2 = 50 + 40 * Math.sin((endAngle * Math.PI) / 180);
-                    
-                    const largeArcFlag = percentage > 50 ? 1 : 0;
-                    
-                    return (
-                      <path
-                        key={index}
-                        d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                        fill={item.color}
-                        stroke="#012A2D"
-                        strokeWidth="1"
-                      />
-                    );
-                  })}
-                </svg>
+            <h2 className="text-xl font-semibold mb-4">Sales Prediction</h2>
+            <div className="h-64 relative">
+              {/* Grid lines */}
+              <div className="absolute inset-0 grid grid-rows-5">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="border-b border-gray-600 border-opacity-30"></div>
+                ))}
+              </div>
+              
+              {/* Chart lines */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                {/* Actual sales line */}
+                <polyline
+                  points={salesPredictionData.slice(0, 6).map((data, index) => 
+                    `${(index / 5) * 50},${100 - ((data.actual || 0) / maxValue) * 80}`
+                  ).join(' ')}
+                  fill="none"
+                  stroke="#3B82F6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
                 
-                {/* Center Text */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-lg font-bold">Total</span>
-                  <span className="text-sm text-gray-300">${totalValue.toLocaleString()}</span>
-                </div>
+                {/* Prediction line */}
+                <polyline
+                  points={salesPredictionData.slice(5).map((data, index) => 
+                    `${((index + 5) / 11) * 100},${100 - ((data.predicted || 0) / maxValue) * 80}`
+                  ).join(' ')}
+                  fill="none"
+                  stroke="#10B981"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray="5,5"
+                />
+                
+                {/* Data points for actual sales */}
+                {salesPredictionData.slice(0, 6).map((data, index) => (
+                  <circle
+                    key={`actual-${index}`}
+                    cx={(index / 5) * 50}
+                    cy={100 - ((data.actual || 0) / maxValue) * 80}
+                    r="2"
+                    fill="#3B82F6"
+                  />
+                ))}
+                
+                {/* Data points for predictions */}
+                {salesPredictionData.slice(5).map((data, index) => (
+                  <circle
+                    key={`predicted-${index}`}
+                    cx={((index + 5) / 11) * 100}
+                    cy={100 - ((data.predicted || 0) / maxValue) * 80}
+                    r="2"
+                    fill="#10B981"
+                  />
+                ))}
+              </svg>
+              
+              {/* Month labels */}
+              <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-300">
+                {salesPredictionData.map((data, index) => (
+                  <span key={index} className="transform -rotate-45 origin-left">
+                    {data.month}
+                  </span>
+                ))}
               </div>
             </div>
             
             {/* Legend */}
-            <div className="grid grid-cols-1 gap-2 mt-4">
-              {profitLossData.map((item, index) => (
-                <div key={index} className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div 
-                      className="w-3 h-3 rounded mr-2"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="text-sm">{item.category}</span>
-                  </div>
-                  <span className="text-sm font-semibold">${item.value.toLocaleString()}</span>
-                </div>
-              ))}
+            <div className="flex justify-center space-x-4 mt-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                <span className="text-xs">Actual Sales</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                <span className="text-xs">Predicted Sales</span>
+              </div>
             </div>
           </div>
         </div>
