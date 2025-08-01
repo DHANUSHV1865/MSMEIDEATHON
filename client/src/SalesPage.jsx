@@ -16,7 +16,7 @@ export default function SalesPage() {
       products: ["Apples", "Bananas", "Oranges"],
       total: 8.99,
       date: "2024-01-14",
-      status: "Pending"
+      status: "Completed"
     },
     {
       id: 3,
@@ -30,7 +30,6 @@ export default function SalesPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [newSale, setNewSale] = useState({
     customer: "",
@@ -100,33 +99,9 @@ export default function SalesPage() {
     setShowViewModal(true);
   };
 
-  const handleEditSale = (sale) => {
-    setSelectedSale(sale);
-    setNewSale({
-      customer: sale.customer,
-      products: [...sale.products],
-      total: sale.total
-    });
-    setShowEditModal(true);
-  };
-
   const handleDeleteSale = (saleId) => {
     if (window.confirm('Are you sure you want to delete this sale?')) {
       setSales(sales.filter(sale => sale.id !== saleId));
-    }
-  };
-
-  const handleUpdateSale = () => {
-    if (selectedSale && newSale.customer && newSale.products.length > 0) {
-      const updatedSales = sales.map(sale => 
-        sale.id === selectedSale.id 
-          ? { ...sale, customer: newSale.customer, products: newSale.products, total: newSale.total }
-          : sale
-      );
-      setSales(updatedSales);
-      setNewSale({ customer: "", products: [], total: 0 });
-      setSelectedSale(null);
-      setShowEditModal(false);
     }
   };
 
@@ -177,11 +152,7 @@ export default function SalesPage() {
                     <td className="px-6 py-4 text-sm font-semibold">${sale.total.toFixed(2)}</td>
                     <td className="px-6 py-4 text-sm text-gray-300">{sale.date}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        sale.status === "Completed" 
-                          ? "bg-green-500 text-white" 
-                          : "bg-yellow-500 text-black"
-                      }`}>
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-500 text-white">
                         {sale.status}
                       </span>
                     </td>
@@ -192,12 +163,6 @@ export default function SalesPage() {
                           className="text-blue-400 hover:text-blue-300 text-sm bg-blue-900 bg-opacity-20 px-2 py-1 rounded hover:bg-opacity-30 transition-colors"
                         >
                           View
-                        </button>
-                        <button 
-                          onClick={() => handleEditSale(sale)}
-                          className="text-green-400 hover:text-green-300 text-sm bg-green-900 bg-opacity-20 px-2 py-1 rounded hover:bg-opacity-30 transition-colors"
-                        >
-                          Edit
                         </button>
                         <button 
                           onClick={() => handleDeleteSale(sale.id)}
@@ -356,11 +321,7 @@ export default function SalesPage() {
 
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-300">Status</label>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  selectedSale.status === "Completed" 
-                    ? "bg-green-500 text-white" 
-                    : "bg-yellow-500 text-black"
-                }`}>
+                <span className="px-2 py-1 text-xs rounded-full bg-green-500 text-white">
                   {selectedSale.status}
                 </span>
               </div>
@@ -372,99 +333,6 @@ export default function SalesPage() {
                 className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-500 transition-colors"
               >
                 Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Sale Modal */}
-      {showEditModal && selectedSale && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#435355] rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Edit Sale #{selectedSale.id}</h2>
-              <button 
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Customer Info */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Customer Name</label>
-                <input
-                  type="text"
-                  value={newSale.customer}
-                  onChange={(e) => setNewSale({...newSale, customer: e.target.value})}
-                  className="w-full p-3 bg-[#012A2D] rounded-lg text-white border border-gray-600 focus:border-yellow-400 focus:outline-none"
-                  placeholder="Enter customer name"
-                />
-              </div>
-
-              {/* Selected Products */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Selected Products</label>
-                <div className="bg-[#012A2D] rounded-lg p-3 min-h-[100px]">
-                  {newSale.products.length === 0 ? (
-                    <p className="text-gray-400 text-sm">No products selected</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {newSale.products.map((product, index) => (
-                        <div key={index} className="flex justify-between items-center bg-[#435355] p-2 rounded">
-                          <span className="text-sm">{product}</span>
-                          <button 
-                            onClick={() => removeProductFromSale(index)}
-                            className="text-red-400 hover:text-red-300 text-sm"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="mt-2 text-right">
-                  <span className="text-lg font-bold">Total: ${newSale.total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Grocery Items Grid */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium mb-4">Select Grocery Items</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {groceryItems.map((item, index) => (
-                  <button
-                    key={index}
-                    onClick={() => addProductToSale(item)}
-                    className="bg-[#012A2D] p-3 rounded-lg hover:bg-[#2a3a3c] transition-colors text-center"
-                  >
-                    <div className="text-2xl mb-1">{item.emoji}</div>
-                    <div className="text-sm font-medium">{item.name}</div>
-                    <div className="text-xs text-gray-300">${item.price}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdateSale}
-                disabled={!newSale.customer || newSale.products.length === 0}
-                className="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Update Sale
               </button>
             </div>
           </div>
