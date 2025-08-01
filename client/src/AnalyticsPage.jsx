@@ -1,13 +1,31 @@
 import React from "react";
 
 export default function AnalyticsPage() {
+  // Demo data for charts
+  const salesData = [
+    { month: 'Jan', sales: 12000, revenue: 15000 },
+    { month: 'Feb', sales: 15000, revenue: 18000 },
+    { month: 'Mar', sales: 18000, revenue: 22000 },
+    { month: 'Apr', sales: 16000, revenue: 20000 },
+    { month: 'May', sales: 20000, revenue: 25000 },
+    { month: 'Jun', sales: 22000, revenue: 28000 }
+  ];
+
+  const profitLossData = [
+    { category: 'Profit', value: 45000, color: '#10B981' },
+    { category: 'Loss', value: 8000, color: '#EF4444' },
+    { category: 'Expenses', value: 12000, color: '#F59E0B' }
+  ];
+
+  const totalValue = profitLossData.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <div className="min-h-screen bg-[#012A2D] text-white p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Analytics & Reports</h1>
         
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Key Metrics - 3x3 Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-[#435355] p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
@@ -51,58 +69,119 @@ export default function AnalyticsPage() {
               <div className="text-3xl">🛒</div>
             </div>
           </div>
+
+          <div className="bg-[#435355] p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-300 text-sm">Total Sales</p>
+                <p className="text-2xl font-bold">$1,739.49</p>
+              </div>
+              <div className="text-3xl">💰</div>
+            </div>
+          </div>
+          
+          <div className="bg-[#435355] p-6 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-300 text-sm">This Month</p>
+                <p className="text-2xl font-bold">$1,250.00</p>
+              </div>
+              <div className="text-3xl">📅</div>
+            </div>
+          </div>
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Sales Chart */}
+          {/* Sales Trend Chart */}
           <div className="bg-[#435355] p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Sales Trend</h2>
-            <div className="h-64 bg-[#012A2D] rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">📊</div>
-                <p className="text-gray-300">Sales Chart</p>
-                <p className="text-sm text-gray-400">Chart visualization would go here</p>
+            <h2 className="text-xl font-semibold mb-4">Sales & Revenue Trend</h2>
+            <div className="h-64 flex items-end justify-between space-x-2">
+              {salesData.map((data, index) => (
+                <div key={index} className="flex flex-col items-center flex-1">
+                  <div className="flex flex-col items-center space-y-1 mb-2">
+                    <div 
+                      className="w-full bg-blue-500 rounded-t"
+                      style={{ height: `${(data.sales / 25000) * 120}px` }}
+                    ></div>
+                    <div 
+                      className="w-full bg-green-500 rounded-t"
+                      style={{ height: `${(data.revenue / 30000) * 120}px` }}
+                    ></div>
+                  </div>
+                  <span className="text-xs text-gray-300">{data.month}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center space-x-4 mt-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                <span className="text-xs">Sales</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                <span className="text-xs">Revenue</span>
               </div>
             </div>
           </div>
 
-          {/* Top Products */}
+          {/* Profit/Loss Pie Chart */}
           <div className="bg-[#435355] p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Top Selling Products</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-[#012A2D] rounded">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">💻</span>
-                  <div>
-                    <p className="font-medium">Gaming Laptop</p>
-                    <p className="text-sm text-gray-300">45 units sold</p>
-                  </div>
+            <h2 className="text-xl font-semibold mb-4">Profit & Loss Analysis</h2>
+            <div className="flex items-center justify-center h-64">
+              <div className="relative w-48 h-48">
+                {/* Pie Chart */}
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  {profitLossData.map((item, index) => {
+                    const percentage = (item.value / totalValue) * 100;
+                    const previousPercentages = profitLossData
+                      .slice(0, index)
+                      .reduce((sum, prevItem) => sum + (prevItem.value / totalValue) * 100, 0);
+                    
+                    const startAngle = (previousPercentages / 100) * 360;
+                    const endAngle = ((previousPercentages + percentage) / 100) * 360;
+                    
+                    const x1 = 50 + 40 * Math.cos((startAngle * Math.PI) / 180);
+                    const y1 = 50 + 40 * Math.sin((startAngle * Math.PI) / 180);
+                    const x2 = 50 + 40 * Math.cos((endAngle * Math.PI) / 180);
+                    const y2 = 50 + 40 * Math.sin((endAngle * Math.PI) / 180);
+                    
+                    const largeArcFlag = percentage > 50 ? 1 : 0;
+                    
+                    return (
+                      <path
+                        key={index}
+                        d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
+                        fill={item.color}
+                        stroke="#012A2D"
+                        strokeWidth="1"
+                      />
+                    );
+                  })}
+                </svg>
+                
+                {/* Center Text */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold">Total</span>
+                  <span className="text-sm text-gray-300">${totalValue.toLocaleString()}</span>
                 </div>
-                <span className="text-green-400 font-semibold">$58,500</span>
               </div>
-              
-              <div className="flex items-center justify-between p-3 bg-[#012A2D] rounded">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">🎧</span>
-                  <div>
-                    <p className="font-medium">Wireless Headphones</p>
-                    <p className="text-sm text-gray-300">89 units sold</p>
+            </div>
+            
+            {/* Legend */}
+            <div className="grid grid-cols-1 gap-2 mt-4">
+              {profitLossData.map((item, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div 
+                      className="w-3 h-3 rounded mr-2"
+                      style={{ backgroundColor: item.color }}
+                    ></div>
+                    <span className="text-sm">{item.category}</span>
                   </div>
+                  <span className="text-sm font-semibold">${item.value.toLocaleString()}</span>
                 </div>
-                <span className="text-green-400 font-semibold">$8,010</span>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-[#012A2D] rounded">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">⌨️</span>
-                  <div>
-                    <p className="font-medium">Mechanical Keyboard</p>
-                    <p className="text-sm text-gray-300">67 units sold</p>
-                  </div>
-                </div>
-                <span className="text-green-400 font-semibold">$10,050</span>
-              </div>
+              ))}
             </div>
           </div>
         </div>

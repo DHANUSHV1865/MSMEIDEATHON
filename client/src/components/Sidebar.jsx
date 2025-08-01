@@ -7,7 +7,7 @@ export default function Sidebar() {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/", label: "Home", emoji: "��" },
+    { path: "/", label: "Home", emoji: "🏠" },
     { path: "/dashboard", label: "Dashboard", emoji: "📊" },
     { path: "/products", label: "Products", emoji: "🛒" },
     { path: "/inventory", label: "Inventory", emoji: "📦" },
