@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNotifications } from "./components/NotificationContext";
 
 export default function InventoryPage() {
+  const { addNotification } = useNotifications();
+
   const products = [
     { id: 1, name: "Rice Bags (25kg)", stock: 50, price: 1200 },
     { id: 2, name: "Cooking Oil (5L)", stock: 30, price: 450 },
@@ -17,6 +20,28 @@ export default function InventoryPage() {
   const outOfStockCount = products.filter((p) => p.stock === 0).length;
   const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
   const totalProducts = products.length;
+
+  // Auto-generate notifications on mount
+  useEffect(() => {
+    products.forEach((p) => {
+      if (p.stock === 0) {
+        addNotification({
+          title: `Out of Stock: ${p.name}`,
+          message: `${p.name} is currently out of stock.`,
+          details: `Consider contacting suppliers or creating a purchase order to restock ${p.name}.`,
+          category: "Out of Stock",
+        }, `out-${p.id}`);
+      } else if (p.stock > 0 && p.stock < 20) {
+        addNotification({
+          title: `Low Stock: ${p.name}`,
+          message: `${p.name} is running low (only ${p.stock} left).`,
+          details: `Recommended: Review Analytics for demand and contact suppliers to restock ${p.name}.`,
+          category: "Low Stock",
+        }, `low-${p.id}`);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#435355] p-6 text-white">
@@ -73,10 +98,12 @@ export default function InventoryPage() {
                       className={`px-3 py-1 rounded text-sm font-bold ${
                         isOutOfStock
                           ? "bg-red-500 text-white"
+                          : product.stock < 20
+                          ? "bg-yellow-500 text-black"
                           : "bg-green-500 text-white"
                       }`}
                     >
-                      {isOutOfStock ? "Out of Stock" : "In Stock"}
+                      {isOutOfStock ? "Out of Stock" : product.stock < 20 ? "Low Stock" : "In Stock"}
                     </span>
                   </td>
                 </tr>

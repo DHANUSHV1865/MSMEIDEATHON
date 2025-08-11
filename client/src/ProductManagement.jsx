@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNotifications } from "./components/NotificationContext";
 
 export default function ProductManagement() {
+  const { addNotification } = useNotifications();
   const [products, setProducts] = useState([
     { id: 1, name: "Rice Bags (25kg)", price: 1200, stock: 50, category: "Grains", supplier: "Bulk Food Suppliers" },
     { id: 2, name: "Cooking Oil (5L)", price: 450, stock: 30, category: "Oils", supplier: "Fresh Grocery Supplies" },
@@ -107,7 +109,19 @@ export default function ProductManagement() {
       purchaseItems.forEach((item) => {
         const existingProduct = newProducts.find((p) => p.name === item.name);
         if (existingProduct) {
+          const before = existingProduct.stock;
           existingProduct.stock += item.quantity;
+          const after = existingProduct.stock;
+
+          if (before < 20 && after >= 20) {
+            addNotification({
+              title: `Restocked: ${existingProduct.name}`,
+              message: `${existingProduct.name} is now sufficiently stocked (${after} units).`,
+              category: "System Update",
+              details: `Previous stock: ${before}. Added: ${item.quantity}.`,
+              read: false,
+            });
+          }
         } else {
           newProducts.push({
             id: newProducts.length + 1,
@@ -116,6 +130,13 @@ export default function ProductManagement() {
             stock: item.quantity,
             category: "New",
             supplier: selectedSupplier
+          });
+          addNotification({
+            title: `New Product Added: ${item.name}`,
+            message: `${item.name} added to inventory with ${item.quantity} units.`,
+            category: "System Update",
+            details: `Source supplier: ${selectedSupplier}.`,
+            read: false,
           });
         }
       });
